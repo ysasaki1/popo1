@@ -9,15 +9,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>ユーザー登録</h1>
-        <input type="email" id="email" placeholder="メールアドレス" required>
-        <input type="password" id="password" placeholder="パスワード" required>
-        <button id="registerButton">登録</button>
-        
-        <h1>ログイン</h1>
-        <input type="email" id="loginEmail" placeholder="メールアドレス" required>
-        <input type="password" id="loginPassword" placeholder="パスワード" required>
-        <button id="loginButton">ログイン</button>
+        <div class="form-section">
+            <h1>ユーザー登録</h1>
+            <input type="email" id="email" placeholder="メールアドレス" required>
+            <input type="password" id="password" placeholder="パスワード" required>
+            <button id="registerButton" class="small-button">登録</button>
+        </div>
+
+        <div class="form-section">
+            <h1>ログイン</h1>
+            <input type="email" id="loginEmail" placeholder="メールアドレス" required>
+            <input type="password" id="loginPassword" placeholder="パスワード" required>
+            <button id="loginButton" class="small-button">ログイン</button>
+        </div>
 
         <div id="errorModal" class="modal">
             <div class="modal-content">
