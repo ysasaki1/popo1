@@ -23,9 +23,13 @@ body {
     text-align: center; /* セクション内のテキストを中央寄せ */
 }
 
+h1 {
+    font-size: 90%; /* ユーザーページのタイトルを少し小さく */
+}
+
 h2 {
     text-align: center; /* 標題を中央寄せ */
-    font-size: 90%; /* 標題のサイズを20%小さくする */
+    font-size: 100%; /* 元のサイズから少し小さくする（例えば10%小さく） */
 }
 
 input {
@@ -78,7 +82,7 @@ input {
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 90%;
+    width: 80%;
 }
 
 .close {
