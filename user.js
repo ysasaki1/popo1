@@ -92,8 +92,15 @@ async function loadCertifications(uid) {
     querySnapshot.forEach((doc) => {
         const data = doc.data();
         const li = document.createElement('li');
-        li.textContent = `${data.qualification} (難易度: `;
-        li.innerHTML += getStarRating(data.difficulty) + ')'; // 星表記を追加
+        li.className = 'qualification-item'; // クラスを追加
+
+        const qualificationText = document.createElement('span');
+        qualificationText.className = 'qualification-text'; // 資格テキスト用のクラスを追加
+        qualificationText.textContent = `${data.qualification}`; // 資格名を表示
+
+        const stars = document.createElement('span');
+        stars.className = 'star-rating'; // 星表記用のクラスを追加
+        stars.innerHTML = getStarRating(data.difficulty); // 星表記を追加
 
         const deleteButton = document.createElement('button');
         deleteButton.textContent = '削除';
@@ -102,7 +109,11 @@ async function loadCertifications(uid) {
             await deleteCertification(doc.id);
         };
 
-        li.appendChild(deleteButton);
+        // 資格名、難易度、削除ボタンを追加
+        li.appendChild(qualificationText);
+        li.appendChild(stars); // 星表記を追加
+        li.appendChild(deleteButton); // 削除ボタンを追加
+
         certificationList.appendChild(li);
     });
 }
