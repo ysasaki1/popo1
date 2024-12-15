@@ -1,7 +1,6 @@
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { Chart } from "https://cdn.jsdelivr.net/npm/chart.js"; // Chart.jsをインポート
 
 // Firebaseの設定
 const firebaseConfig = {
@@ -19,9 +18,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// グローバル変数としてチャートを定義
-let myPieChart;
-
 // ページがロードされたときにユーザーの認証状態を確認
 window.addEventListener('load', () => {
     checkUserAuth();
@@ -32,7 +28,7 @@ function checkUserAuth() {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.getElementById('welcomeMessage').innerText = `${user.email}さん、ようこそ！`;
-            loadCertifications(user.uid); // コレクション名を変更
+            loadCertifications(user.uid);
         } else {
             window.location.href = 'index.html';
         }
@@ -50,10 +46,10 @@ document.getElementById('addQualificationButton').addEventListener('click', asyn
         return;
     }
 
-    await addCertification(user.uid, qualification, difficulty); // 関数名を変更
+    await addCertification(user.uid, qualification, difficulty);
     document.getElementById('qualification').value = '';
     document.getElementById('difficulty').value = '';
-    await loadCertifications(user.uid); // コレクション名を変更
+    await loadCertifications(user.uid);
 });
 
 // ログアウト機能
@@ -69,16 +65,16 @@ document.getElementById('logoutButton').addEventListener('click', async () => {
 });
 
 // 資格・受賞歴の追加
-async function addCertification(uid, qualification, difficulty) { // 関数名を変更
+async function addCertification(uid, qualification, difficulty) {
     try {
-        await addDoc(collection(db, "certifications"), { // コレクション名を変更
+        await addDoc(collection(db, "certifications"), {
             uid: uid,
             qualification: qualification,
             difficulty: difficulty,
             createdAt: new Date().toISOString()
         });
         alert("資格・受賞歴が追加されました。");
-        await loadCertifications(uid); // コレクション名を変更
+        await loadCertifications(uid);
     } catch (error) {
         console.error("資格の追加に失敗しました: ", error);
         alert("資格の追加に失敗しました。詳細: " + error.message);
@@ -86,113 +82,52 @@ async function addCertification(uid, qualification, difficulty) { // 関数名�
 }
 
 // 資格・受賞歴のロード
-async function loadCertifications(uid) { // 関数名を変更
-    const certificationList = document.getElementById('qualificationList'); // 変数名を変更
+async function loadCertifications(uid) {
+    const certificationList = document.getElementById('qualificationList');
     certificationList.innerHTML = '';
 
-    const q = query(collection(db, "certifications"), where("uid", "==", uid)); // コレクション名を変更
+    const q = query(collection(db, "certifications"), where("uid", "==", uid));
     const querySnapshot = await getDocs(q);
     
-    const difficulties = [];
     querySnapshot.forEach((doc) => {
         const data = doc.data();
         const li = document.createElement('li');
-        li.textContent = `${data.qualification} (難易度: ${data.difficulty})`;
+        li.textContent = `${data.qualification} (難易度: `;
+        li.innerHTML += getStarRating(data.difficulty) + ')'; // 星表記を追加
 
         const deleteButton = document.createElement('button');
         deleteButton.textContent = '削除';
         deleteButton.className = 'delete-button';
         deleteButton.onclick = async () => {
-            await deleteCertification(doc.id); // 関数名を変更
+            await deleteCertification(doc.id);
         };
 
         li.appendChild(deleteButton);
         certificationList.appendChild(li);
-
-        difficulties.push(data.difficulty);
     });
-
-    drawPieChart(difficulties); // 難易度の配列を渡す
 }
 
 // 資格の削除
-async function deleteCertification(id) { // 関数名を変更
+async function deleteCertification(id) {
     try {
-        await deleteDoc(doc(db, "certifications", id)); // コレクション名を変更
+        await deleteDoc(doc(db, "certifications", id));
         alert("資格・受賞歴が削除されました。");
         const user = auth.currentUser;
-        await loadCertifications(user.uid); // コレクション名を変更
+        await loadCertifications(user.uid);
     } catch (error) {
         console.error("資格の削除に失敗しました: ", error);
     }
 }
 
-// 円グラフを描画
-function drawPieChart(data) {
-    const ctx = document.getElementById('myPieChart').getContext('2d');
-
-    // 既存のチャートがある場合は破棄する
-    if (myPieChart) {
-        myPieChart.destroy();
+// 星表記を生成する関数
+function getStarRating(difficulty) {
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= difficulty) {
+            stars += '★'; // 塗りつぶしの星
+        } else {
+            stars += '☆'; // 輪郭の星
+        }
     }
-
-    // データが空でない場合のみ描画
-    if (data.length > 0) {
-        const percentiles = [
-            percentile(data, 25),
-            percentile(data, 50),
-            percentile(data, 75)
-        ];
-
-        const labels = ['25th Percentile', 'Median (50th Percentile)', '75th Percentile'];
-        const chartData = [percentiles[0], percentiles[1], percentiles[2]];
-
-        myPieChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: chartData,
-                    backgroundColor: [
-                        'rgba(75, 192, 192, 0.5)',
-                        'rgba(255, 206, 86, 0.5)',
-                        'rgba(153, 102, 255, 0.5)'
-                    ],
-                    borderColor: [
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: '資格の難易度パーセンタイル'
-                    }
-                }
-            }
-        });
-    } else {
-        alert("資格データがありません。");
-    }
-}
-
-// パーセンタイルを計算する関数
-function percentile(arr, p) {
-    arr.sort((a, b) => a - b);
-    const index = (p / 100) * (arr.length - 1);
-    if (Math.floor(index) === index) {
-        return arr[index];
-    } else {
-        const lower = arr[Math.floor(index)];
-        const upper = arr[Math.ceil(index)];
-        return lower + (upper - lower) * (index - Math.floor(index));
-    }
+    return stars;
 }
