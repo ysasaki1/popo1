@@ -72,15 +72,20 @@ input {
     border-bottom: 1px solid #ccc; /* 下にボーダーを追加（オプション） */
 }
 
-.delete-button {
-    margin-left: 10px; /* 左側のマージンを追加してボタンとのスペースを調整 */
+.qualification-item {
+    display: flex; /* フレックスボックスに設定 */
+    align-items: center; /* 縦方向の中央揃え */
+    justify-content: space-between; /* 左右のコンテンツを分散 */
+    width: 100%; /* 幅を100%に設定 */
 }
 
-/* 星表記のスタイル */
 .star-rating {
     margin-left: 10px; /* 星とテキストの間にスペースを追加 */
     font-size: 1.2em; /* 星のサイズを調整 */
-    display: inline-block; /* 星表記をインラインブロックに */
+}
+
+.delete-button {
+    margin-left: 10px; /* 左側のマージンを追加してボタンとのスペースを調整 */
 }
 
 /* モーダルのスタイル */
