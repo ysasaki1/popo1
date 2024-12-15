@@ -123,7 +123,15 @@ function drawBoxPlot(data) {
             labels: ['資格の難易度'],
             datasets: [{
                 label: '難易度パーセンタイル',
-                data: [data], // データを箱ひげ図に渡す
+                data: [
+                    {
+                        min: Math.min(...data),
+                        q1: percentile(data, 25),
+                        median: percentile(data, 50),
+                        q3: percentile(data, 75),
+                        max: Math.max(...data)
+                    }
+                ],
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1
@@ -141,4 +149,17 @@ function drawBoxPlot(data) {
             }
         }
     });
+}
+
+// パーセンタイルを計算する関数
+function percentile(arr, p) {
+    arr.sort((a, b) => a - b);
+    const index = (p / 100) * (arr.length - 1);
+    if (Math.floor(index) === index) {
+        return arr[index];
+    } else {
+        const lower = arr[Math.floor(index)];
+        const upper = arr[Math.ceil(index)];
+        return lower + (upper - lower) * (index - Math.floor(index));
+    }
 }
