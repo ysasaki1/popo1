@@ -14,31 +14,33 @@ body {
     text-align: center;
 }
 
+.form-section {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
 input {
     width: calc(100% - 20px);
     padding: 12px;
     margin: 10px 0;
     border-radius: 5px;
     border: 1px solid #ccc;
-    transition: border-color 0.3s;
 }
 
-input:focus {
-    border-color: #007bff;
-}
-
-button {
-    width: 100%;
+.small-button {
+    width: calc(33.33% - 20px); /* ボタンの幅を1/3に設定 */
     padding: 12px;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-button:hover {
+.small-button:hover {
     background-color: #0056b3;
 }
 
