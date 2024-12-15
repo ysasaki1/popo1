@@ -23,8 +23,9 @@ body {
     text-align: center; /* セクション内のテキストを中央寄せ */
 }
 
-h1, h2 {
+h2 {
     text-align: center; /* 標題を中央寄せ */
+    font-size: 80%; /* 標題のサイズを20%小さくする */
 }
 
 input {
