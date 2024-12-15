@@ -1,6 +1,7 @@
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+import { Chart } from "https://cdn.jsdelivr.net/npm/chart.js"; // Chart.jsをインポート
 
 // Firebaseの設定
 const firebaseConfig = {
@@ -43,15 +44,17 @@ function checkUserAuth() {
 // 資格・受賞歴の追加イベント
 document.getElementById('addQualificationButton').addEventListener('click', async () => {
     const qualification = document.getElementById('qualification').value;
+    const difficulty = parseInt(document.getElementById('difficulty').value); // 難易度を取得
     const user = auth.currentUser; // 現在のユーザーを取得
 
-    if (!qualification) {
-        alert("資格・受賞歴を入力してください。");
+    if (!qualification || isNaN(difficulty)) {
+        alert("資格・受賞歴と難易度を入力してください。");
         return; // 空の場合は処理を中止
     }
 
-    await addQualification(user.uid, qualification);
+    await addQualification(user.uid, qualification, difficulty);
     document.getElementById('qualification').value = ''; // 入力をクリア
+    document.getElementById('difficulty').value = ''; // 難易度をクリア
     await loadQualifications(user.uid); // 更新
 });
 
@@ -68,11 +71,12 @@ document.getElementById('logoutButton').addEventListener('click', async () => {
 });
 
 // 資格・受賞歴の追加
-async function addQualification(uid, qualification) {
+async function addQualification(uid, qualification, difficulty) {
     try {
         await addDoc(collection(db, "qualifications"), {
             uid: uid,
             qualification: qualification,
+            difficulty: difficulty, // 難易度を追加
             createdAt: new Date().toISOString()
         });
         alert("資格・受賞歴が追加されました。");
@@ -91,10 +95,11 @@ async function loadQualifications(uid) {
     const q = query(collection(db, "qualifications"), where("uid", "==", uid));
     const querySnapshot = await getDocs(q);
     
-    const qualifications = [];
+    const difficulties = []; // 難易度の配列を追加
     querySnapshot.forEach((doc) => {
+        const data = doc.data();
         const li = document.createElement('li');
-        li.textContent = doc.data().qualification;
+        li.textContent = `${data.qualification} (難易度: ${data.difficulty})`;
 
         const deleteButton = document.createElement('button');
         deleteButton.textContent = '削除';
@@ -106,10 +111,10 @@ async function loadQualifications(uid) {
         li.appendChild(deleteButton);
         qualificationList.appendChild(li);
 
-        qualifications.push(Math.floor(Math.random() * 100));
+        difficulties.push(data.difficulty); // 難易度を配列に追加
     });
 
-    drawBoxPlot(qualifications);
+    drawBoxPlot(difficulties); // 難易度の配列を渡す
 }
 
 // 資格の削除
@@ -133,39 +138,43 @@ function drawBoxPlot(data) {
         myBoxPlotChart.destroy(); // 既存のチャートを破棄
     }
 
-    // 新しいチャートを作成
-    myBoxPlotChart = new Chart(ctx, {
-        type: 'boxplot',
-        data: {
-            labels: ['資格の難易度'],
-            datasets: [{
-                label: '難易度パーセンタイル',
-                data: [
-                    {
-                        min: Math.min(...data),
-                        q1: percentile(data, 25),
-                        median: percentile(data, 50),
-                        q3: percentile(data, 75),
-                        max: Math.max(...data)
-                    }
-                ],
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'パーセンタイル'
+    // データが空でない場合のみ描画
+    if (data.length > 0) {
+        myBoxPlotChart = new Chart(ctx, {
+            type: 'boxplot',
+            data: {
+                labels: ['資格の難易度'],
+                datasets: [{
+                    label: '難易度パーセンタイル',
+                    data: [
+                        {
+                            min: Math.min(...data),
+                            q1: percentile(data, 25),
+                            median: percentile(data, 50),
+                            q3: percentile(data, 75),
+                            max: Math.max(...data)
+                        }
+                    ],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '難易度'
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    } else {
+        alert("資格データがありません。");
+    }
 }
 
 // パーセンタイルを計算する関数
