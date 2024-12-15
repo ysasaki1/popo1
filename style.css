@@ -11,7 +11,7 @@ body {
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    text-align: left; /* テキストを左寄せに設定 */
 }
 
 .form-section {
@@ -43,6 +43,13 @@ input {
 
 .small-button:hover {
     background-color: #0056b3;
+}
+
+/* 資格リストのスタイル */
+#qualificationList {
+    list-style-type: none; /* デフォルトのリストスタイルを無効化 */
+    padding: 0; /* パディングを削除 */
+    margin: 0; /* マージンを削除 */
 }
 
 /* モーダルのスタイル */
