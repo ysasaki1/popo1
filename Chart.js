@@ -3,55 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>資格の難易度表示</title>
+    <title>箱ひげ図の例</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-boxplot"></script>
     <style>
         /* グラフのコンテナスタイル */
         #myChart {
-            max-width: 400px;
+            max-width: 600px;
             margin: 20px auto;
         }
     </style>
 </head>
 <body>
-    <div class="form-section">
-        <h2>登録した資格の難易度パーセンタイル</h2>
-        <canvas id="myChart"></canvas>
-    </div>
+    <h2>資格の難易度パーセンタイル（箱ひげ図）</h2>
+    <canvas id="myChart"></canvas>
 
     <script>
-        // グラフデータ
+        // データの設定
         const data = {
-            labels: ['資格A', '資格B', '資格C', '資格D', '資格E'], // 資格名
+            labels: ['資格の難易度'],
             datasets: [{
                 label: '難易度パーセンタイル',
-                data: [30, 70, 50, 90, 80], // 各資格の難易度パーセンタイル
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)'
-                ],
+                data: [{
+                    min: 20,
+                    q1: 30,
+                    median: 50,
+                    q3: 70,
+                    max: 90
+                }],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1
             }]
         };
 
-        // グラフ設定
+        // グラフの設定
         const config = {
-            type: 'bar', // グラフの種類（棒グラフ）
+            type: 'boxplot', // 箱ひげ図の種類
             data: data,
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true, // Y軸を0から始める
+                        beginAtZero: true,
                         title: {
                             display: true,
                             text: 'パーセンタイル'
