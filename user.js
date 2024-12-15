@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // グローバル変数としてチャートを定義
-let myBarChart;
+let myPieChart;
 
 // ページがロードされたときにユーザーの認証状態を確認
 window.addEventListener('load', () => {
@@ -112,7 +112,7 @@ async function loadQualifications(uid) {
         difficulties.push(data.difficulty);
     });
 
-    drawBarChart(difficulties); // 難易度の配列を渡す
+    drawPieChart(difficulties); // 難易度の配列を渡す
 }
 
 // 資格の削除
@@ -127,13 +127,13 @@ async function deleteQualification(id) {
     }
 }
 
-// 棒グラフを描画
-function drawBarChart(data) {
-    const ctx = document.getElementById('myBarChart').getContext('2d');
+// 円グラフを描画
+function drawPieChart(data) {
+    const ctx = document.getElementById('myPieChart').getContext('2d');
 
     // 既存のチャートがある場合は破棄する
-    if (myBarChart) {
-        myBarChart.destroy();
+    if (myPieChart) {
+        myPieChart.destroy();
     }
 
     // データが空でない場合のみ描画
@@ -144,13 +144,15 @@ function drawBarChart(data) {
             percentile(data, 75)
         ];
 
-        myBarChart = new Chart(ctx, {
-            type: 'bar',
+        const labels = ['25th Percentile', 'Median (50th Percentile)', '75th Percentile'];
+        const chartData = [percentiles[0], percentiles[1], percentiles[2]];
+
+        myPieChart = new Chart(ctx, {
+            type: 'pie',
             data: {
-                labels: ['25th Percentile', 'Median (50th Percentile)', '75th Percentile'],
+                labels: labels,
                 datasets: [{
-                    label: '難易度パーセンタイル',
-                    data: percentiles,
+                    data: chartData,
                     backgroundColor: [
                         'rgba(75, 192, 192, 0.5)',
                         'rgba(255, 206, 86, 0.5)',
@@ -166,13 +168,13 @@ function drawBarChart(data) {
             },
             options: {
                 responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: '難易度'
-                        }
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: '資格の難易度パーセンタイル'
                     }
                 }
             }
