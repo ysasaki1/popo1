@@ -31,7 +31,7 @@ input {
 }
 
 .small-button {
-    width: calc(33.33% - 20px); /* ボタンの幅を1/3に設定 */
+    width: 33.33%; /* ボタンの幅を1/3に設定 */
     padding: 12px;
     background-color: #007bff;
     color: white;
