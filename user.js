@@ -153,13 +153,4 @@ function drawBoxPlot(data) {
 
 // パーセンタイルを計算する関数
 function percentile(arr, p) {
-    arr.sort((a, b) => a - b);
-    const index = (p / 100) * (arr.length - 1);
-    if (Math.floor(index) === index) {
-        return arr[index];
-    } else {
-        const lower = arr[Math.floor(index)];
-        const upper = arr[Math.ceil(index)];
-        return lower + (upper - lower) * (index - Math.floor(index));
-    }
-}
+   
