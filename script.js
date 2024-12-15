@@ -27,6 +27,7 @@ document.getElementById('registerButton').addEventListener('click', async () => 
     try {
         await createUserWithEmailAndPassword(auth, email, password);
         alert('ユーザー登録成功');
+        window.location.href = 'user.html'; // ユーザーページにリダイレクト
     } catch (error) {
         showError(error.message);
     }
@@ -53,10 +54,4 @@ function showError(message) {
 
 document.getElementById('closeModal').onclick = function() {
     document.getElementById('errorModal').style.display = 'none';
-}
-
-// ログアウト機能
-async function logout() {
-    await signOut(auth);
-    window.location.href = 'index.html'; // ログインページにリダイレクト
 }
