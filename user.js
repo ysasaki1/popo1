@@ -73,6 +73,7 @@ async function loadQualifications(uid) {
     const q = query(collection(db, "qualifications"), where("uid", "==", uid));
     const querySnapshot = await getDocs(q);
     
+    const qualifications = [];
     querySnapshot.forEach((doc) => {
         const li = document.createElement('li');
         li.textContent = doc.data().qualification;
@@ -87,7 +88,13 @@ async function loadQualifications(uid) {
 
         li.appendChild(deleteButton); // リストアイテムに削除ボタンを追加
         qualificationList.appendChild(li);
+
+        // 資格の難易度をサンプルデータとして追加
+        qualifications.push(Math.floor(Math.random() * 100)); // ランダムな値を使用（デモ用）
     });
+
+    // 箱ひげ図を描画
+    drawBoxPlot(qualifications);
 }
 
 // 資格の削除
@@ -100,4 +107,33 @@ async function deleteQualification(id) {
     } catch (error) {
         console.error("資格の削除に失敗しました: ", error);
     }
+}
+
+// 箱ひげ図を描画
+function drawBoxPlot(data) {
+    const ctx = document.getElementById('myBoxPlotChart').getContext('2d');
+    const myBoxPlotChart = new Chart(ctx, {
+        type: 'boxplot',
+        data: {
+            labels: ['資格の難易度'],
+            datasets: [{
+                label: '難易度パーセンタイル',
+                data: [data], // データを箱ひげ図に渡す
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'パーセンタイル'
+                    }
+                }
+            }
+        }
+    });
 }
