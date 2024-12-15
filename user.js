@@ -18,44 +18,49 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ユーザーの状態を監視
-onAuthStateChanged(auth, async (user) => {
+// ページがロードされたときにユーザーの認証状態を確認
+window.addEventListener('load', () => {
+    checkUserAuth();
+});
+
+// ユーザーの認証状態を確認する関数
+function checkUserAuth() {
+    const user = auth.currentUser;
     if (user) {
         // ユーザーがログインしている場合
         document.getElementById('welcomeMessage').innerText = `${user.email}さん、ようこそ！`;
-        await loadQualifications(user.uid);
+        loadQualifications(user.uid);
     } else {
         // ユーザーが未ログインの場合
-        setTimeout(() => {
-            window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
-        }, 2000); // 2秒遅延
+        window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
+    }
+}
+
+// 資格・受賞歴の追加イベント
+document.getElementById('addQualificationButton').addEventListener('click', async () => {
+    const qualification = document.getElementById('qualification').value;
+    const user = auth.currentUser; // 現在のユーザーを取得
+
+    if (!qualification) {
+        alert("資格・受賞歴を入力してください。");
+        return; // 空の場合は処理を中止
     }
 
-    // 資格・受賞歴の追加イベント
-    document.getElementById('addQualificationButton').addEventListener('click', async () => {
-        const qualification = document.getElementById('qualification').value;
+    await addQualification(user.uid, qualification);
+    document.getElementById('qualification').value = ''; // 入力をクリア
+    await loadQualifications(user.uid); // 更新
+});
 
-        if (!qualification) {
-            alert("資格・受賞歴を入力してください。");
-            return; // 空の場合は処理を中止
-        }
-
-        await addQualification(user.uid, qualification);
-        document.getElementById('qualification').value = ''; // 入力をクリア
-        await loadQualifications(user.uid); // 更新
-    });
-
-    // ログアウト機能
-    document.getElementById('logoutButton').addEventListener('click', async () => {
-        try {
-            await signOut(auth);
-            alert("ログアウトしました。");
-            window.location.href = 'index.html'; // ログインページにリダイレクト
-        } catch (error) {
-            console.error("ログアウトに失敗しました: ", error);
-            alert("ログアウトに失敗しました。詳細: " + error.message);
-        }
-    });
+// ログアウト機能
+document.getElementById('logoutButton').addEventListener('click', async () => {
+    try {
+        await signOut(auth);
+        alert("ログアウトしました。");
+        window.location.href = 'index.html'; // ログインページにリダイレクト
+    } catch (error) {
+        console.error("ログアウトに失敗しました: ", error);
+        alert("ログアウトに失敗しました。詳細: " + error.message);
+    }
 });
 
 // 資格・受賞歴の追加
@@ -108,7 +113,7 @@ async function deleteQualification(id) {
     try {
         await deleteDoc(doc(db, "qualifications", id));
         alert("資格・受賞歴が削除されました。");
-        const user = getAuth().currentUser;
+        const user = auth.currentUser;
         await loadQualifications(user.uid);
     } catch (error) {
         console.error("資格の削除に失敗しました: ", error);
