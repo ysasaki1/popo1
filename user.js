@@ -130,7 +130,7 @@ function drawBoxPlot(data) {
 
     // 既存のチャートがある場合は破棄する
     if (myBoxPlotChart) {
-        myBoxPlotChart.destroy();
+        myBoxPlotChart.destroy(); // 既存のチャートを破棄
     }
 
     // 新しいチャートを作成
