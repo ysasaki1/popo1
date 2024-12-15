@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // グローバル変数としてチャートを定義
-let myBoxPlotChart;
+let myBarChart;
 
 // ページがロードされたときにユーザーの認証状態を確認
 window.addEventListener('load', () => {
@@ -31,12 +31,10 @@ window.addEventListener('load', () => {
 function checkUserAuth() {
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // ユーザーがログインしている場合
             document.getElementById('welcomeMessage').innerText = `${user.email}さん、ようこそ！`;
             loadQualifications(user.uid);
         } else {
-            // ユーザーが未ログインの場合
-            window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
+            window.location.href = 'index.html';
         }
     });
 }
@@ -44,18 +42,18 @@ function checkUserAuth() {
 // 資格・受賞歴の追加イベント
 document.getElementById('addQualificationButton').addEventListener('click', async () => {
     const qualification = document.getElementById('qualification').value;
-    const difficulty = parseInt(document.getElementById('difficulty').value); // 難易度を取得
-    const user = auth.currentUser; // 現在のユーザーを取得
+    const difficulty = parseInt(document.getElementById('difficulty').value);
+    const user = auth.currentUser;
 
     if (!qualification || isNaN(difficulty)) {
         alert("資格・受賞歴と難易度を入力してください。");
-        return; // 空の場合は処理を中止
+        return;
     }
 
     await addQualification(user.uid, qualification, difficulty);
-    document.getElementById('qualification').value = ''; // 入力をクリア
-    document.getElementById('difficulty').value = ''; // 難易度をクリア
-    await loadQualifications(user.uid); // 更新
+    document.getElementById('qualification').value = '';
+    document.getElementById('difficulty').value = '';
+    await loadQualifications(user.uid);
 });
 
 // ログアウト機能
@@ -63,7 +61,7 @@ document.getElementById('logoutButton').addEventListener('click', async () => {
     try {
         await signOut(auth);
         alert("ログアウトしました。");
-        window.location.href = 'index.html'; // ログインページにリダイレクト
+        window.location.href = 'index.html';
     } catch (error) {
         console.error("ログアウトに失敗しました: ", error);
         alert("ログアウトに失敗しました。詳細: " + error.message);
@@ -76,7 +74,7 @@ async function addQualification(uid, qualification, difficulty) {
         await addDoc(collection(db, "qualifications"), {
             uid: uid,
             qualification: qualification,
-            difficulty: difficulty, // 難易度を追加
+            difficulty: difficulty,
             createdAt: new Date().toISOString()
         });
         alert("資格・受賞歴が追加されました。");
@@ -95,7 +93,7 @@ async function loadQualifications(uid) {
     const q = query(collection(db, "qualifications"), where("uid", "==", uid));
     const querySnapshot = await getDocs(q);
     
-    const difficulties = []; // 難易度の配列を追加
+    const difficulties = [];
     querySnapshot.forEach((doc) => {
         const data = doc.data();
         const li = document.createElement('li');
@@ -111,10 +109,10 @@ async function loadQualifications(uid) {
         li.appendChild(deleteButton);
         qualificationList.appendChild(li);
 
-        difficulties.push(data.difficulty); // 難易度を配列に追加
+        difficulties.push(data.difficulty);
     });
 
-    drawBoxPlot(difficulties); // 難易度の配列を渡す
+    drawBarChart(difficulties); // 難易度の配列を渡す
 }
 
 // 資格の削除
@@ -129,38 +127,45 @@ async function deleteQualification(id) {
     }
 }
 
-// 箱ひげ図を描画
-function drawBoxPlot(data) {
-    const ctx = document.getElementById('myBoxPlotChart').getContext('2d');
+// 棒グラフを描画
+function drawBarChart(data) {
+    const ctx = document.getElementById('myBarChart').getContext('2d');
 
     // 既存のチャートがある場合は破棄する
-    if (myBoxPlotChart) {
-        myBoxPlotChart.destroy(); // 既存のチャートを破棄
+    if (myBarChart) {
+        myBarChart.destroy();
     }
 
     // データが空でない場合のみ描画
     if (data.length > 0) {
-        myBoxPlotChart = new Chart(ctx, {
-            type: 'boxplot',
+        const percentiles = [
+            percentile(data, 25),
+            percentile(data, 50),
+            percentile(data, 75)
+        ];
+
+        myBarChart = new Chart(ctx, {
+            type: 'bar',
             data: {
-                labels: ['資格の難易度'],
+                labels: ['25th Percentile', 'Median (50th Percentile)', '75th Percentile'],
                 datasets: [{
                     label: '難易度パーセンタイル',
-                    data: [
-                        {
-                            min: Math.min(...data),
-                            q1: percentile(data, 25),
-                            median: percentile(data, 50),
-                            q3: percentile(data, 75),
-                            max: Math.max(...data)
-                        }
+                    data: percentiles,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(153, 102, 255, 0.5)'
                     ],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
                     borderWidth: 1
                 }]
             },
             options: {
+                responsive: true,
                 scales: {
                     y: {
                         beginAtZero: true,
