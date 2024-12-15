@@ -66,26 +66,21 @@ input {
 
 #qualificationList li {
     display: flex; /* フレックスボックスに設定 */
-    justify-content: center; /* 中央寄せ */
+    justify-content: space-between; /* 左右のコンテンツを分散 */
     align-items: center; /* 縦方向の中央揃え */
     padding: 8px; /* パディングを追加 */
     border-bottom: 1px solid #ccc; /* 下にボーダーを追加（オプション） */
 }
 
 .delete-button {
-    margin-left: auto; /* 左側のマージンを自動に設定して右寄せ */
+    margin-left: 10px; /* 左側のマージンを追加してボタンとのスペースを調整 */
 }
 
 /* 星表記のスタイル */
-.qualification-item {
-    display: flex;
-    align-items: center; /* 縦に揃える */
-    justify-content: center; /* 中央寄せ */
-}
-
 .star-rating {
-    margin-left: 5px; /* 星とテキストの間にスペースを追加 */
+    margin-left: 10px; /* 星とテキストの間にスペースを追加 */
     font-size: 1.2em; /* 星のサイズを調整 */
+    display: inline-block; /* 星表記をインラインブロックに */
 }
 
 /* モーダルのスタイル */
