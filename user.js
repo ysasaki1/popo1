@@ -1,5 +1,5 @@
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 
 // Firebaseの設定
@@ -59,7 +59,7 @@ async function addQualification(uid, qualification) {
             createdAt: new Date().toISOString() // 作成日時
         });
         alert("資格・受賞歴が追加されました。");
-        await loadPercentiles(uid); // パーセンタイルを再読み込み
+        await loadQualifications(uid); // 更新
     } catch (error) {
         console.error("資格の追加に失敗しました: ", error);
     }
@@ -76,54 +76,28 @@ async function loadQualifications(uid) {
     querySnapshot.forEach((doc) => {
         const li = document.createElement('li');
         li.textContent = doc.data().qualification;
+
+        // 削除ボタンを作成
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = '削除';
+        deleteButton.className = 'delete-button';
+        deleteButton.onclick = async () => {
+            await deleteQualification(doc.id); // 資格を削除
+        };
+
+        li.appendChild(deleteButton); // リストアイテムに削除ボタンを追加
         qualificationList.appendChild(li);
     });
-
-    await loadPercentiles(uid); // 資格をロードした後にパーセンタイルを表示
 }
 
-// 資格の難易度パーセンタイルをロード
-async function loadPercentiles(uid) {
-    const qualifications = []; // 資格の配列
-    const q = query(collection(db, "qualifications"), where("uid", "==", uid));
-    const querySnapshot = await getDocs(q);
-    
-    querySnapshot.forEach((doc) => {
-        qualifications.push(doc.data().qualification);
-    });
-
-    // パーセンタイルのサンプルデータ（実際にはデータベースから取得する必要があります）
-    const percentiles = qualifications.map((qual) => Math.floor(Math.random() * 100)); // ランダムなパーセンタイルを生成（デモ用）
-
-    // グラフの描画
-    drawChart(qualifications, percentiles);
-}
-
-// グラフを描画
-function drawChart(labels, data) {
-    const ctx = document.getElementById('myChart').getContext('2d');
-    const myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: '難易度パーセンタイル',
-                data: data,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'パーセンタイル'
-                    }
-                }
-            }
-        }
-    });
+// 資格の削除
+async function deleteQualification(id) {
+    try {
+        await deleteDoc(doc(db, "qualifications", id));
+        alert("資格・受賞歴が削除されました。");
+        const user = getAuth().currentUser; // 現在のユーザーを取得
+        await loadQualifications(user.uid); // 更新
+    } catch (error) {
+        console.error("資格の削除に失敗しました: ", error);
+    }
 }
