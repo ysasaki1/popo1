@@ -78,6 +78,11 @@ input {
     width: 100%; /* 幅を100%に設定 */
 }
 
+.qualification-text {
+    flex-grow: 1; /* 資格テキストの幅を拡張 */
+    text-align: left; /* 左寄せ */
+}
+
 .star-rating {
     margin-left: 10px; /* 星とテキストの間にスペースを追加 */
     font-size: 1.2em; /* 星のサイズを調整 */
@@ -87,6 +92,7 @@ input {
 
 .delete-button {
     margin-left: 10px; /* 左側のマージンを追加してボタンとのスペースを調整 */
+    text-align: right; /* 右寄せ */
 }
 
 /* モーダルのスタイル */
