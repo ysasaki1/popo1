@@ -50,6 +50,11 @@ input {
     list-style-type: none; /* デフォルトのリストスタイルを無効化 */
     padding: 0; /* パディングを削除 */
     margin: 0; /* マージンを削除 */
+    text-align: left; /* リストを左寄せに設定 */
+}
+
+#qualificationList li {
+    text-align: left; /* 各リストアイテムも左寄せ */
 }
 
 /* モーダルのスタイル */
