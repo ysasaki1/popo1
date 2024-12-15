@@ -28,11 +28,14 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('addQualificationButton').addEventListener('click', async () => {
             const qualification = document.getElementById('qualification').value;
 
-            if (qualification) {
-                await addQualification(user.uid, qualification);
-                document.getElementById('qualification').value = ''; // 入力をクリア
-                await loadQualifications(user.uid); // 更新
+            if (!qualification) {
+                alert("資格・受賞歴を入力してください。");
+                return; // 空の場合は処理を中止
             }
+
+            await addQualification(user.uid, qualification);
+            document.getElementById('qualification').value = ''; // 入力をクリア
+            await loadQualifications(user.uid); // 更新
         });
 
         // ログアウト機能
@@ -62,6 +65,7 @@ async function addQualification(uid, qualification) {
         await loadQualifications(uid); // 更新
     } catch (error) {
         console.error("資格の追加に失敗しました: ", error);
+        alert("資格の追加に失敗しました。詳細: " + error.message);
     }
 }
 
