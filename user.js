@@ -32,7 +32,7 @@ function checkUserAuth() {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.getElementById('welcomeMessage').innerText = `${user.email}さん、ようこそ！`;
-            loadQualifications(user.uid);
+            loadCertifications(user.uid); // コレクション名を変更
         } else {
             window.location.href = 'index.html';
         }
@@ -50,10 +50,10 @@ document.getElementById('addQualificationButton').addEventListener('click', asyn
         return;
     }
 
-    await addQualification(user.uid, qualification, difficulty);
+    await addCertification(user.uid, qualification, difficulty); // 関数名を変更
     document.getElementById('qualification').value = '';
     document.getElementById('difficulty').value = '';
-    await loadQualifications(user.uid);
+    await loadCertifications(user.uid); // コレクション名を変更
 });
 
 // ログアウト機能
@@ -69,16 +69,16 @@ document.getElementById('logoutButton').addEventListener('click', async () => {
 });
 
 // 資格・受賞歴の追加
-async function addQualification(uid, qualification, difficulty) {
+async function addCertification(uid, qualification, difficulty) { // 関数名を変更
     try {
-        await addDoc(collection(db, "qualifications"), {
+        await addDoc(collection(db, "certifications"), { // コレクション名を変更
             uid: uid,
             qualification: qualification,
             difficulty: difficulty,
             createdAt: new Date().toISOString()
         });
         alert("資格・受賞歴が追加されました。");
-        await loadQualifications(uid);
+        await loadCertifications(uid); // コレクション名を変更
     } catch (error) {
         console.error("資格の追加に失敗しました: ", error);
         alert("資格の追加に失敗しました。詳細: " + error.message);
@@ -86,11 +86,11 @@ async function addQualification(uid, qualification, difficulty) {
 }
 
 // 資格・受賞歴のロード
-async function loadQualifications(uid) {
-    const qualificationList = document.getElementById('qualificationList');
-    qualificationList.innerHTML = '';
+async function loadCertifications(uid) { // 関数名を変更
+    const certificationList = document.getElementById('qualificationList'); // 変数名を変更
+    certificationList.innerHTML = '';
 
-    const q = query(collection(db, "qualifications"), where("uid", "==", uid));
+    const q = query(collection(db, "certifications"), where("uid", "==", uid)); // コレクション名を変更
     const querySnapshot = await getDocs(q);
     
     const difficulties = [];
@@ -103,11 +103,11 @@ async function loadQualifications(uid) {
         deleteButton.textContent = '削除';
         deleteButton.className = 'delete-button';
         deleteButton.onclick = async () => {
-            await deleteQualification(doc.id);
+            await deleteCertification(doc.id); // 関数名を変更
         };
 
         li.appendChild(deleteButton);
-        qualificationList.appendChild(li);
+        certificationList.appendChild(li);
 
         difficulties.push(data.difficulty);
     });
@@ -116,12 +116,12 @@ async function loadQualifications(uid) {
 }
 
 // 資格の削除
-async function deleteQualification(id) {
+async function deleteCertification(id) { // 関数名を変更
     try {
-        await deleteDoc(doc(db, "qualifications", id));
+        await deleteDoc(doc(db, "certifications", id)); // コレクション名を変更
         alert("資格・受賞歴が削除されました。");
         const user = auth.currentUser;
-        await loadQualifications(user.uid);
+        await loadCertifications(user.uid); // コレクション名を変更
     } catch (error) {
         console.error("資格の削除に失敗しました: ", error);
     }
