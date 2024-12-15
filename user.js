@@ -25,15 +25,16 @@ window.addEventListener('load', () => {
 
 // ユーザーの認証状態を確認する関数
 function checkUserAuth() {
-    const user = auth.currentUser;
-    if (user) {
-        // ユーザーがログインしている場合
-        document.getElementById('welcomeMessage').innerText = `${user.email}さん、ようこそ！`;
-        loadQualifications(user.uid);
-    } else {
-        // ユーザーが未ログインの場合
-        window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
-    }
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // ユーザーがログインしている場合
+            document.getElementById('welcomeMessage').innerText = `${user.email}さん、ようこそ！`;
+            loadQualifications(user.uid);
+        } else {
+            // ユーザーが未ログインの場合
+            window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
+        }
+    });
 }
 
 // 資格・受賞歴の追加イベント
