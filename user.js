@@ -2,7 +2,7 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 
-// Firebaseの初期化
+// Firebaseの設定
 const firebaseConfig = {
     apiKey: "AIzaSyCEDnTkokqJkA2a2Av80EUhgjvWgdFkZyM",
     authDomain: "popo1-e5216.firebaseapp.com",
@@ -37,8 +37,13 @@ onAuthStateChanged(auth, async (user) => {
 
         // ログアウト機能
         document.getElementById('logoutButton').addEventListener('click', async () => {
-            await signOut(auth);
-            window.location.href = 'index.html'; // ログインページにリダイレクト
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html'; // ログインページにリダイレクト
+            } catch (error) {
+                console.error("ログアウトに失敗しました: ", error);
+                alert("ログアウトに失敗しました。");
+            }
         });
     } else {
         window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
@@ -49,9 +54,9 @@ onAuthStateChanged(auth, async (user) => {
 async function addQualification(uid, qualification) {
     try {
         await addDoc(collection(db, "qualifications"), {
-            uid: uid,
-            qualification: qualification,
-            createdAt: new Date().toISOString()
+            uid: uid, // ユーザーID
+            qualification: qualification, // 資格情報
+            createdAt: new Date().toISOString() // 作成日時
         });
         alert("資格・受賞歴が追加されました。");
     } catch (error) {
