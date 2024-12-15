@@ -4,7 +4,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebas
 
 // Firebaseの設定
 const firebaseConfig = {
-    apiKey: "AIzaSyCEDnTkokqJkA2a2Av80EUhgjvWgdFkZyM",
+    apiKey: "AIzaSyCEDnTtokqJkA2a2Av80EUhgjvWgdFkZyM",
     authDomain: "popo1-e5216.firebaseapp.com",
     projectId: "popo1-e5216",
     storageBucket: "popo1-e5216.appspot.com",
@@ -42,10 +42,11 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('logoutButton').addEventListener('click', async () => {
             try {
                 await signOut(auth);
+                alert("ログアウトしました。");
                 window.location.href = 'index.html'; // ログインページにリダイレクト
             } catch (error) {
                 console.error("ログアウトに失敗しました: ", error);
-                alert("ログアウトに失敗しました。");
+                alert("ログアウトに失敗しました。詳細: " + error.message);
             }
         });
     } else {
