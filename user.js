@@ -18,6 +18,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// グローバル変数としてチャートを定義
+let myBoxPlotChart;
+
 // ページがロードされたときにユーザーの認証状態を確認
 window.addEventListener('load', () => {
     checkUserAuth();
@@ -124,7 +127,14 @@ async function deleteQualification(id) {
 // 箱ひげ図を描画
 function drawBoxPlot(data) {
     const ctx = document.getElementById('myBoxPlotChart').getContext('2d');
-    const myBoxPlotChart = new Chart(ctx, {
+
+    // 既存のチャートがある場合は破棄する
+    if (myBoxPlotChart) {
+        myBoxPlotChart.destroy();
+    }
+
+    // 新しいチャートを作成
+    myBoxPlotChart = new Chart(ctx, {
         type: 'boxplot',
         data: {
             labels: ['資格の難易度'],
