@@ -59,6 +59,7 @@ async function addQualification(uid, qualification) {
             createdAt: new Date().toISOString() // 作成日時
         });
         alert("資格・受賞歴が追加されました。");
+        await loadPercentiles(uid); // パーセンタイルを再読み込み
     } catch (error) {
         console.error("資格の追加に失敗しました: ", error);
     }
@@ -76,5 +77,53 @@ async function loadQualifications(uid) {
         const li = document.createElement('li');
         li.textContent = doc.data().qualification;
         qualificationList.appendChild(li);
+    });
+
+    await loadPercentiles(uid); // 資格をロードした後にパーセンタイルを表示
+}
+
+// 資格の難易度パーセンタイルをロード
+async function loadPercentiles(uid) {
+    const qualifications = []; // 資格の配列
+    const q = query(collection(db, "qualifications"), where("uid", "==", uid));
+    const querySnapshot = await getDocs(q);
+    
+    querySnapshot.forEach((doc) => {
+        qualifications.push(doc.data().qualification);
+    });
+
+    // パーセンタイルのサンプルデータ（実際にはデータベースから取得する必要があります）
+    const percentiles = qualifications.map((qual) => Math.floor(Math.random() * 100)); // ランダムなパーセンタイルを生成（デモ用）
+
+    // グラフの描画
+    drawChart(qualifications, percentiles);
+}
+
+// グラフを描画
+function drawChart(labels, data) {
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '難易度パーセンタイル',
+                data: data,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'パーセンタイル'
+                    }
+                }
+            }
+        }
     });
 }
