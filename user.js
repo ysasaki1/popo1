@@ -24,36 +24,36 @@ onAuthStateChanged(auth, async (user) => {
         // ユーザーがログインしている場合
         document.getElementById('welcomeMessage').innerText = `${user.email}さん、ようこそ！`;
         await loadQualifications(user.uid);
-        
-        // 資格・受賞歴の追加イベント
-        document.getElementById('addQualificationButton').addEventListener('click', async () => {
-            const qualification = document.getElementById('qualification').value;
-
-            if (!qualification) {
-                alert("資格・受賞歴を入力してください。");
-                return; // 空の場合は処理を中止
-            }
-
-            await addQualification(user.uid, qualification);
-            document.getElementById('qualification').value = ''; // 入力をクリア
-            await loadQualifications(user.uid); // 更新
-        });
-
-        // ログアウト機能
-        document.getElementById('logoutButton').addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                alert("ログアウトしました。");
-                window.location.href = 'index.html'; // ログインページにリダイレクト
-            } catch (error) {
-                console.error("ログアウトに失敗しました: ", error);
-                alert("ログアウトに失敗しました。詳細: " + error.message);
-            }
-        });
     } else {
         // ユーザーが未ログインの場合
         window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
     }
+
+    // 資格・受賞歴の追加イベント
+    document.getElementById('addQualificationButton').addEventListener('click', async () => {
+        const qualification = document.getElementById('qualification').value;
+
+        if (!qualification) {
+            alert("資格・受賞歴を入力してください。");
+            return; // 空の場合は処理を中止
+        }
+
+        await addQualification(user.uid, qualification);
+        document.getElementById('qualification').value = ''; // 入力をクリア
+        await loadQualifications(user.uid); // 更新
+    });
+
+    // ログアウト機能
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+            alert("ログアウトしました。");
+            window.location.href = 'index.html'; // ログインページにリダイレクト
+        } catch (error) {
+            console.error("ログアウトに失敗しました: ", error);
+            alert("ログアウトに失敗しました。詳細: " + error.message);
+        }
+    });
 });
 
 // 資格・受賞歴の追加
