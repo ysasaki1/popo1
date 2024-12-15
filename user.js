@@ -1,57 +1,32 @@
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
 // Firebaseの初期化
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyCEDnTkokqJkA2a2Av80EUhgjvWgdFkZyM",
+    authDomain: "popo1-e5216.firebaseapp.com",
+    projectId: "popo1-e5216",
+    storageBucket: "popo1-e5216.appspot.com",
+    messagingSenderId: "623743254259",
+    appId: "1:623743254259:web:a538e7dc230a7d59e60186",
+    measurementId: "G-1B4008JG5P"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Firebaseの初期化
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-document.addEventListener("DOMContentLoaded", async () => {
-    const user = auth.currentUser;
-
+// ユーザーの状態を監視
+onAuthStateChanged(auth, async (user) => {
     if (user) {
         document.getElementById('welcomeMessage').innerText = `${user.email}さん、ようこそ！`;
-        loadQualifications();
+        await loadQualifications(user.uid);
     } else {
         window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
     }
-
-    document.getElementById('addQualificationButton').addEventListener('click', async () => {
-        const qualification = document.getElementById('qualification').value;
-
-        if (qualification) {
-            await db.collection('qualifications').add({
-                uid: user.uid,
-                qualification: qualification,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            document.getElementById('qualification').value = ''; // 入力をクリア
-            loadQualifications(); // 更新
-        }
-    });
-
-    document.getElementById('logoutButton').addEventListener('click', async () => {
-        await auth.signOut();
-        window.location.href = 'index.html'; // ログインページにリダイレクト
-    });
 });
 
-async function loadQualifications() {
-    const user = auth.currentUser;
-    const qualificationList = document.getElementById('qualificationList');
-    qualificationList.innerHTML = ''; // 既存のリストをクリア
-
-    const snapshot = await db.collection('qualifications').where('uid', '==', user.uid).get();
-    snapshot.forEach(doc => {
-        const li = document.createElement('li');
-        li.textContent = doc.data().qualification;
-        qualificationList.appendChild(li);
-    });
-}
+// 資格・受賞歴の追加
+document.getElementById('addQualificationButton').addEventListener('click', async () => {
+    const qualification = document.getElement
