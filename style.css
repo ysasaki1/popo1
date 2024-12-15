@@ -11,7 +11,7 @@ body {
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    text-align: center; /* コンテナ内のテキストを中央寄せに設定 */
+    text-align: center; /* コンテナ内のテキストを中央寄せ */
 }
 
 .form-section {
@@ -23,10 +23,14 @@ body {
     text-align: center; /* セクション内のテキストを中央寄せ */
 }
 
+h1, h2 {
+    text-align: center; /* 標題を中央寄せ */
+}
+
 input {
     width: calc(100% - 20px);
     padding: 12px;
-    margin: 10px 0;
+    margin: 10px auto; /* 上下のマージンを追加 */
     border-radius: 5px;
     border: 1px solid #ccc;
 }
@@ -40,7 +44,8 @@ input {
     border-radius: 5px;
     cursor: pointer;
     box-sizing: border-box; /* パディングとボーダーを含めたサイズ計算 */
-    margin: 10px 0; /* 上下のマージンを追加 */
+    display: inline-block; /* インラインブロック要素にして中央寄せ可能に */
+    margin: 10px auto; /* 上下のマージンを追加し、中央寄せ */
 }
 
 .small-button:hover {
