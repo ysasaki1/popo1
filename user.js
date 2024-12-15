@@ -26,7 +26,9 @@ onAuthStateChanged(auth, async (user) => {
         await loadQualifications(user.uid);
     } else {
         // ユーザーが未ログインの場合
-        window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
+        setTimeout(() => {
+            window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
+        }, 2000); // 2秒遅延
     }
 
     // 資格・受賞歴の追加イベント
