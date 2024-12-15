@@ -21,6 +21,7 @@ const db = getFirestore(app);
 // ユーザーの状態を監視
 onAuthStateChanged(auth, async (user) => {
     if (user) {
+        // ユーザーがログインしている場合
         document.getElementById('welcomeMessage').innerText = `${user.email}さん、ようこそ！`;
         await loadQualifications(user.uid);
         
@@ -50,6 +51,7 @@ onAuthStateChanged(auth, async (user) => {
             }
         });
     } else {
+        // ユーザーが未ログインの場合
         window.location.href = 'index.html'; // 未ログインの場合はログインページにリダイレクト
     }
 });
@@ -58,12 +60,12 @@ onAuthStateChanged(auth, async (user) => {
 async function addQualification(uid, qualification) {
     try {
         await addDoc(collection(db, "qualifications"), {
-            uid: uid, // ユーザーID
-            qualification: qualification, // 資格情報
-            createdAt: new Date().toISOString() // 作成日時
+            uid: uid,
+            qualification: qualification,
+            createdAt: new Date().toISOString()
         });
         alert("資格・受賞歴が追加されました。");
-        await loadQualifications(uid); // 更新
+        await loadQualifications(uid);
     } catch (error) {
         console.error("資格の追加に失敗しました: ", error);
         alert("資格の追加に失敗しました。詳細: " + error.message);
@@ -73,7 +75,7 @@ async function addQualification(uid, qualification) {
 // 資格・受賞歴のロード
 async function loadQualifications(uid) {
     const qualificationList = document.getElementById('qualificationList');
-    qualificationList.innerHTML = ''; // リストをクリア
+    qualificationList.innerHTML = '';
 
     const q = query(collection(db, "qualifications"), where("uid", "==", uid));
     const querySnapshot = await getDocs(q);
@@ -83,22 +85,19 @@ async function loadQualifications(uid) {
         const li = document.createElement('li');
         li.textContent = doc.data().qualification;
 
-        // 削除ボタンを作成
         const deleteButton = document.createElement('button');
         deleteButton.textContent = '削除';
         deleteButton.className = 'delete-button';
         deleteButton.onclick = async () => {
-            await deleteQualification(doc.id); // 資格を削除
+            await deleteQualification(doc.id);
         };
 
-        li.appendChild(deleteButton); // リストアイテムに削除ボタンを追加
+        li.appendChild(deleteButton);
         qualificationList.appendChild(li);
 
-        // 資格の難易度をサンプルデータとして追加
-        qualifications.push(Math.floor(Math.random() * 100)); // ランダムな値を使用（デモ用）
+        qualifications.push(Math.floor(Math.random() * 100));
     });
 
-    // 箱ひげ図を描画
     drawBoxPlot(qualifications);
 }
 
@@ -107,8 +106,8 @@ async function deleteQualification(id) {
     try {
         await deleteDoc(doc(db, "qualifications", id));
         alert("資格・受賞歴が削除されました。");
-        const user = getAuth().currentUser; // 現在のユーザーを取得
-        await loadQualifications(user.uid); // 更新
+        const user = getAuth().currentUser;
+        await loadQualifications(user.uid);
     } catch (error) {
         console.error("資格の削除に失敗しました: ", error);
     }
@@ -153,4 +152,13 @@ function drawBoxPlot(data) {
 
 // パーセンタイルを計算する関数
 function percentile(arr, p) {
-   
+    arr.sort((a, b) => a - b);
+    const index = (p / 100) * (arr.length - 1);
+    if (Math.floor(index) === index) {
+        return arr[index];
+    } else {
+        const lower = arr[Math.floor(index)];
+        const upper = arr[Math.ceil(index)];
+        return lower + (upper - lower) * (index - Math.floor(index));
+    }
+}
